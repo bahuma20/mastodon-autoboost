@@ -1,4 +1,4 @@
-import App from "./App.js";
+import App from "./src/App.js";
 
 (async function () {
     const app = new App();

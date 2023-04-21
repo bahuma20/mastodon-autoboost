@@ -2,6 +2,7 @@ import express from "express";
 import {MongoClient} from "mongodb";
 import ActivitypubExpress from "activitypub-express";
 import WebFinger from "webfinger.js";
+import Mastodon from "./Mastodon.js";
 
 
 class AccountNotFoundException extends Error {
@@ -13,8 +14,10 @@ export default class App {
     #MONGODB_CONNECTION_STRING;
     #app;
     #mongoDb;
+    #mastodon;
     #apex;
     #webfinger;
+
     #routes = {
         actor: '/u/:actor',
         object: '/o/:id',
@@ -31,8 +34,8 @@ export default class App {
         shares: '/s/:id/shares',
         likes: '/s/:id/likes'
     };
-
     #packageJson = process.env.npm_package_version;
+
 
     constructor() {
         this.#DOMAIN = process.env.DOMAIN || 'localhost';
@@ -79,6 +82,8 @@ export default class App {
         this.#apex.store.db = this.#mongoDb.db();
         await this.#apex.store.setup();
 
+        this.#mastodon = new Mastodon(this.#app, this.#mongoDb.db());
+
         await this.#initSystemUser();
 
         this.#app.listen(this.#PORT, async () => {
@@ -89,6 +94,7 @@ export default class App {
     }
 
     #setupRoutes() {
+        // ActivityPub
         this.#app.route(this.#routes.inbox)
             .get(this.#apex.net.inbox.get)
             .post(this.#apex.net.inbox.post)
@@ -110,22 +116,13 @@ export default class App {
     }
 
     #setupListeners() {
-        this.#app.on('apex-outbox', msg => {
-            if (msg.activity.type === 'Create') {
-                console.log(`New ${msg.object.type} from ${msg.actor}`);
-            }
-        });
-
-        this.#app.on('apex-inbox', msg => {
+        this.#app.on('apex-inbox', async msg => {
             console.log('incoming message');
             console.log(msg);
             console.log(JSON.stringify(msg));
             switch (msg.activity.type.toLowerCase()) {
                 case 'create':
-                    this.#onCreate(msg);
-            }
-            if (msg.activity.type === 'Create') {
-                console.log(`New ${msg.object.type} from ${msg.actor} to ${msg.recipient}`)
+                    await this.#onCreate(msg);
             }
         })
     }
@@ -151,6 +148,7 @@ export default class App {
     }
 
     async #followAccounts() {
+        // TODO: Make accounts configurable per user
         const accounts = [
             'testa@noitl.space'
         ];
@@ -164,7 +162,6 @@ export default class App {
                         "@id": id,
                     }
                 });
-                console.log(followActivity);
                 console.log(await this.#apex.addToOutbox(this.#apex.systemUser, followActivity));
             } catch (e) {
                 console.error(e);
@@ -191,10 +188,8 @@ export default class App {
 
     }
 
-    #onCreate(msg) {
-        console.log('msg created');
-        const audience = this.#apex.audienceFromActivity(msg.activity);
-        console.log(audience);
-        // TODO: Boost content with accounts that have configured it via Mastodon api
+    async #onCreate(msg) {
+        console.log('A message was created');
+        await this.#mastodon.boost(msg.object.id);
     }
 }
