@@ -139,9 +139,9 @@ export default class App {
                 url: `https://${this.#DOMAIN}/f/guppe.png`
             }
             const systemUser = await this.#apex.createActor(
-                'system_service',
-                `${this.#DOMAIN} system service`,
-                `${this.#DOMAIN} system service`,
+                'autoboostbot',
+                `Mastodon Auto Boost Bot`,
+                `Follows you to boost your posts`,
                 icon,
                 'Person');
             await this.#apex.store.saveObject(systemUser);
