@@ -131,7 +131,7 @@ export default class App {
     }
 
     async #initSystemUser() {
-        this.#apex.systemUser = await this.#apex.store.getObject(this.#apex.utils.usernameToIRI('system_service'), true);
+        this.#apex.systemUser = await this.#apex.store.getObject(this.#apex.utils.usernameToIRI('autoboostbot'), true);
         if (!this.#apex.systemUser) {
             const icon = {
                 type: 'Image',
