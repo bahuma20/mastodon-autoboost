@@ -158,7 +158,7 @@ export default class App {
         for (const account of accounts) {
             try {
                 const id = await this.#getUserIdFromAccountName(account);
-                const followActivity = await this.#apex.buildActivity('Follow', this.#apex.systemUser, id);
+                const followActivity = await this.#apex.buildActivity('Follow', this.#apex.systemUser.id, id);
                 console.log(followActivity);
                 console.log(await this.#apex.addToOutbox(this.#apex.systemUser, followActivity));
             } catch (e) {
