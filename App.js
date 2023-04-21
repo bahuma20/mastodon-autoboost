@@ -143,7 +143,7 @@ export default class App {
                 `${this.#DOMAIN} system service`,
                 `${this.#DOMAIN} system service`,
                 icon,
-                'Service');
+                'Person');
             await this.#apex.store.saveObject(systemUser);
             this.#apex.systemUser = systemUser;
         }
