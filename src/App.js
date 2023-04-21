@@ -12,6 +12,8 @@ export default class App {
     #DOMAIN;
     #PORT;
     #MONGODB_CONNECTION_STRING;
+    #FOLLOW_ACCOUNTS;
+
     #app;
     #mongoDb;
     #mastodon;
@@ -37,10 +39,16 @@ export default class App {
     #packageJson = process.env.npm_package_version;
 
 
+
     constructor() {
         this.#DOMAIN = process.env.DOMAIN || 'localhost';
         this.#PORT = process.env.PORT || '8080';
         this.#MONGODB_CONNECTION_STRING = process.env.MONGODB_CONNECTION_STRING || 'mongodb://localhost:27017/mastodon_autoboost';
+
+        const followaccounts = process.env.FOLLOW_ACCOUNTS;
+        if (!followaccounts) throw new Error('Environment variable FOLLOW_ACCOUNTS is missing');
+        this.#FOLLOW_ACCOUNTS = followaccounts.split(',');
+
         this.#webfinger = new WebFinger({
             webfistFallback: false,
             tlsOnly: true,
@@ -149,11 +157,7 @@ export default class App {
 
     async #followAccounts() {
         // TODO: Make accounts configurable per user
-        const accounts = [
-            'testa@noitl.space'
-        ];
-
-        for (const account of accounts) {
+        for (const account of this.#FOLLOW_ACCOUNTS) {
             try {
                 const id = await this.#getUserIdFromAccountName(account);
                 const followActivity = await this.#apex.buildActivity('Follow', this.#apex.systemUser.id, id, {

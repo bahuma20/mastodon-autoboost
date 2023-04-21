@@ -11,3 +11,4 @@ Automatically boost posts from fediverse users with your mastodon account.
 - `MASTODON_CLIENT_ID`: Mastodon Client ID
 - `MASTODON_CLIENT_SECRET`: Mastodon Client Secret
 - `SECRET`: A secret that is used for sessions, passwords and co...
+- `FOLLOW_ACCOUNTS`: Which accounts to follow. Separated by comma. (Example: "@bahuma20@noitl.space,@bahuma20@pixelfed.de,@bahuma20@theunseen.city")
