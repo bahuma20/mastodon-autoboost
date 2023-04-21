@@ -117,6 +117,9 @@ export default class App {
         });
 
         this.#app.on('apex-inbox', msg => {
+            console.log('incoming message');
+            console.log(msg);
+            console.log(JSON.stringify(msg));
             switch (msg.activity.type.toLowerCase()) {
                 case 'create':
                     this.#onCreate(msg);
