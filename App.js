@@ -136,7 +136,7 @@ export default class App {
             const icon = {
                 type: 'Image',
                 mediaType: 'image/jpeg',
-                url: `https://${this.#DOMAIN}/f/guppe.png`
+                url: `https://${this.#DOMAIN}/f/avatar.png`
             }
             const systemUser = await this.#apex.createActor(
                 'autoboostbot',
@@ -158,7 +158,12 @@ export default class App {
         for (const account of accounts) {
             try {
                 const id = await this.#getUserIdFromAccountName(account);
-                const followActivity = await this.#apex.buildActivity('Follow', this.#apex.systemUser.id, id);
+                const followActivity = await this.#apex.buildActivity('Follow', this.#apex.systemUser.id, id, {
+                    object: {
+                        "@type": "Person",
+                        "@id": id,
+                    }
+                });
                 console.log(followActivity);
                 console.log(await this.#apex.addToOutbox(this.#apex.systemUser, followActivity));
             } catch (e) {
