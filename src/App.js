@@ -161,10 +161,7 @@ export default class App {
             try {
                 const id = await this.#getUserIdFromAccountName(account);
                 const followActivity = await this.#apex.buildActivity('Follow', this.#apex.systemUser.id, id, {
-                    object: {
-                        "@type": "Person",
-                        "@id": id,
-                    }
+                    object: id
                 });
                 console.log(await this.#apex.addToOutbox(this.#apex.systemUser, followActivity));
             } catch (e) {
@@ -175,6 +172,8 @@ export default class App {
     }
 
     #getUserIdFromAccountName(accountName) {
+        console.log(`Searching for account ${accountName}`);
+
         return new Promise((resolve, reject) => {
             this.#webfinger.lookup(accountName, (err, webfingerData) => {
                 if (err) {
